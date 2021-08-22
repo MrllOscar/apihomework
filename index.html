@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="keywords" content="台灣每日股票，收盤價高於10且當日交易量大於2000，股票統計並提供搜尋及排序功能">
+  <meta name="keywords" content="每日,股票,收盤價>10,交易量>2000">
+  <meta name="robots" content="notranslate">
+  <meta name="author" content="Oscar.C">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>台股每日交易量高於2000、收盤價高於10</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"
+    integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ=="
+    crossorigin="anonymous"></script>
+    <link rel="Shortcut Icon" href="favicon.ico" type="image/x-icon" >
+  <!-- <link rel="stylesheet" type="text/css"
+    href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.0.1/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs5/dt-1.10.25/datatables.min.css" />
+
+  <script type="text/javascript"
+    src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.0.1/js/bootstrap.bundle.min.js"></script>
+  <script type="text/javascript" src="https://cdn.datatables.net/v/bs5/dt-1.10.25/datatables.min.js"></script> -->
+  <link rel="stylesheet" type="text/css"
+    href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.0.1/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css"
+    href="https://cdn.datatables.net/v/bs5/dt-1.10.25/b-1.7.1/b-html5-1.7.1/kt-2.6.2/sc-2.0.4/sp-1.3.0/datatables.min.css" />
+
+  <script type="text/javascript"
+    src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.0.1/js/bootstrap.bundle.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+  <script type="text/javascript"
+    src="https://cdn.datatables.net/v/bs5/dt-1.10.25/b-1.7.1/b-html5-1.7.1/kt-2.6.2/sc-2.0.4/sp-1.3.0/datatables.min.js"></script>
+    
+
+
+<!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-Q3BV9LWT7R"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-Q3BV9LWT7R');
+  </script>
+
+  <style>
+    body {
+      background-image: url('https://png.pngtree.com/background/20210710/original/pngtree-business-finance-stock-chart-poster-banner-picture-image_1049208.jpg');
+      background-size: cover;
+    }
+
+    .center {
+      display: flex;
+      justify-content: space-evenly;
+    }
+
+    @media (width:850px) {}
+
+    .w90 {
+      margin: auto;
+      width: 90%;
+    }
+    footer>a>img{
+      height: 36px;
+      width: 182px;
+    }
+    footer,h1{
+      background: #666;
+    }
+    footer>a{
+      text-decoration: none;
+      color: #f8f9fa;
+    }
+  </style>
+
+</head>
+
+<body>
+  <h1 class="text-center text-light">台股每日簡報</h1>
+  <div class="container">
+    <div class="row">
+      <div class="text-center">預設值:股票金額>10、股票成交量>2000</div>
+      <!-- <form action="?do=ok" method="get">
+        <div class="center">
+          <input type="text" id="stocklow" name="stocklow" value="" placeholder="最小收盤價，預設10">
+          <input type="text" id="stockhigh" name="stockhigh" value="" placeholder="最大收盤價，預設無上限">
+          <input type="text" id="stockcount" name="stockcount" value="" placeholder="成交量，預設5000">
+          <input type="button" onclick="input()" value="送出">
+        </div>
+      </form> -->
+    </div>
+  </div>
+  <div class="w90">
+    <table class="table table-dark table-hover table-sm align-middle">
+      <thead>
+      </thead>
+      <tbody class="table-warning">
+      </tbody>
+    </table>
+  </div>
+  <footer class="text-center text-light">資料來源：<a href="https://data.gov.tw/" target="_blank"><img src="https://data.gov.tw/_nuxt/img/logo.4fd0012.svg">政府資料開放平台</a>
+  </footer>
+  <script>
+    let apidata, overten = [], title = [], data = [], stocklow = 10, stockhigh, stockcount = 5000;
+    $('#stocklow').val(stocklow)
+    $('#stockhigh').val(stockhigh)
+    $('#stockcount').val(stockcount)
+
+    // function input(){
+    //   if(stocklow)stocklow=$("#stocklow").val();$('#stocklow').val(stocklow)
+    //   if(stockhigh)stockhigh=$("#stockhigh").val();$('#stockhigh').val(stockhigh)
+    //   if(stockcount)stockcount=$("#stockcount").val();$('#stockcount').val(stockcount)
+    //         for (const i in apidata) {
+    //     if (stockcount && apidata[i]['成交筆數'] < stockcount) continue;
+    //     if (stocklow && apidata[i]['收盤價'] < stocklow) continue;
+    //     if (stockhigh && apidata[i]['收盤價'] > stockhigh) continue;
+    //     overten.push(apidata[i]);
+    //   }
+    // }
+
+    $.get('api.php').done(function (re) { //自己做一個後端，再去跟同網域的後端取得
+      apidata = JSON.parse(re);
+      for (const i in apidata) {
+        // for (let i = 0; i < apidata.length; i++) {
+        if (apidata[i]['成交筆數'] > 2000 && apidata[i]['收盤價'] > 10) overten.push(apidata[i]);
+        // if(stockcount){apidata[i]['成交筆數'] > stockcount;}else{apidata[i]['成交筆數'] > 5000;} &&
+        // if(stocklow){apidata[i]['收盤價'] > stocklow;}else{apidata[i]['收盤價'] > 10;} &&
+        // if(stockhigh){apidata[i]['收盤價'] < stockhigh;}else{''}
+        // )  overten.push(apidata[i]) ;
+      }
+
+
+
+      Object.keys(apidata[0]).forEach(re => title.push(re));
+      $('thead').append(`<tr></tr>`)
+      title.forEach(rr => { $('thead').find('tr').append('<th>' + rr + '</th>') })
+      overten.forEach(re => data.push(re));
+      for (let i = 0; i < overten.length; i++) {
+        // console.log(data[i]);
+        $('tbody').append('<tr></tr>');
+        title.forEach(rr =>
+          $('tbody').find('tr:last').append('<td>' + data[i][rr] + '</td>')
+        )
+      }
+      $("table").DataTable();
+    });
+
+  </script>
+</body>
+
+</html>
